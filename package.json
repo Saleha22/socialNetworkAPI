@@ -1,7 +1,7 @@
 {
-  "name": "socialnetworkapi",
+  "name": "socialNetworkAPI",
   "version": "1.0.0",
-  "description": "",
+  "description": "## Table of contents",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.js",

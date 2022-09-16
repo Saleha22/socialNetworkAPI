@@ -1,61 +1,38 @@
 const { User } = require("../../models");
 
-const addFriend = async (req, res) => {
+const createFriendForUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    console.log(id, userId);
-
-    if (id) {
-      const friend = await User.findByIdAndUpdate(userId, {
-        $push: { friends: id },
-      });
-
-      return res.status(201).json({
-        success: true,
-        data: friend,
-      });
-    }
-
-    return res.status(400).json({
-      success: false,
-      error: "Please enter the user ID for the friend.",
-    });
+    const { userId } = req.params;
+    const data = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: { friends: req.body._id },
+      },
+      { new: true }
+    ).populate("friends");
+    return res.json({ success: true, data });
   } catch (error) {
-    console.log(`[ERROR: Failed to add friend | ${error.message}]`);
-
-    return res.status(500).json({
-      success: false,
-      error: "Failed to add friend",
-    });
+    console.log(`[ERROR]: Failed to create new friend | ${error.message}`);
+    return res
+      .status(404)
+      .json({ success: false, error: "Failed to create new friend" });
   }
 };
-const deleteFriend = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { friendId } = req.body;
-    console.log(id, friendId);
 
-    const updatedUser = await User.findByIdAndUpdate(id, {
+const deleteFriendByUser = async (req, res) => {
+  try {
+    const { userId, friendId } = req.params;
+
+    const user = await User.findByIdAndUpdate(userId, {
       $pull: { friends: friendId },
     });
-    console.log(updatedUser);
-    return res.status(201).json({
-      success: true,
-      updatedUser,
-    });
+    return res.json({ success: true, data: user });
   } catch (error) {
-    console.log(`[ERROR: Failed to delete friend | ${error.message}]`);
-
-    return res.status(500).json({
-      success: false,
-      error: "Failed to delete friend",
-    });
+    console.log(`[ERROR]: Failed to delete friend | ${error.message}`);
+    return res
+      .status(404)
+      .json({ success: false, error: "Failed to delete friend" });
   }
 };
 
-module.exports = {
-  addFriend,
-  deleteFriend,
-};
+module.exports = { createFriendForUser, deleteFriendByUser };

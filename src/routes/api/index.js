@@ -1,11 +1,11 @@
-const router = require("express").Router();
-const reactionsRoutes = require("./reactions");
+const { Router } = require("express");
 
-const thoughtsRoutes = require("./thoughts");
-const usersRoutes = require("./users");
+const users = require("./users");
+const thoughts = require("./thoughts");
 
-router.use("/reaction", reactionsRoutes);
-router.use("/thoughts", thoughtsRoutes);
-router.use("/users", usersRoutes);
+const router = Router();
+
+router.use("/users", users);
+router.use("/thoughts", thoughts);
 
 module.exports = router;

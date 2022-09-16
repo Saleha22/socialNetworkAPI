@@ -1,50 +1,49 @@
-// import { ObjectId } from "mongoose";
-const { Thought } = require("../../models");
+// const { Thought } = require("../../models");
 
-const addReaction = async (req, res) => {
+const createReactionForThought = async (req, res) => {
   try {
-    const { id } = req.params;
+    //get the thought id from reqest parameteres
+    const { thoughtId } = req.params;
 
-    const { reactionBody, userName } = req.body;
+    //push the new reaction into the reactions array for that specific thought id
+    const data = await Thought.findByIdAndUpdate(
+      thoughtId,
+      {
+        $push: { reactions: { ...req.body } },
+      },
+      { new: true }
+    );
 
-    const thoughtToUpdate = await Thought.findByIdAndUpdate(id, {
-      $push: { reactions: req.body },
-    });
-
-    return res.status(201).json({
-      success: true,
-      thoughtToUpdate,
-    });
+    return res.json({ success: true, data });
   } catch (error) {
-    console.log(`[ERROR]: Failed to add reaction | ${error.message}`);
-    return res
-      .status(500)
-      .json({ success: false, error: "Failed to add reaction" });
-  }
-};
+    console.log(
+      `[ERROR]: Failed to create a new reaction for present thought | ${error.message}`
+    );
 
-const deleteReaction = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { reactionId } = req.body;
-
-    const updatedThought = await Thought.findByIdAndUpdate(id, {
-      $pull: { reactions: { reactionId: reactionId } },
-    });
-    return res.status(201).json({
-      success: true,
-      data: updatedThought,
-    });
-  } catch (error) {
-    console.log(`[ERROR: Failed to delete reaction | ${error.message}]`);
-    return res.status(500).json({
+    return res.status(404).json({
       success: false,
-      error: "Failed to delete reaction",
+      error: "Failed to create a new reaction for present thought",
     });
   }
 };
 
-module.exports = {
-  addReaction,
-  deleteReaction,
+const deleteReactionByThought = async (req, res) => {
+  try {
+    const { thoughtId, reactionId } = req.params;
+    const data = await Thought.findByIdAndUpdate(
+      thoughtId,
+      {
+        $pull: { reactions: { _id: reactionId } },
+      },
+      { new: true }
+    );
+    return res.json({ success: true, data });
+  } catch (error) {
+    console.log(`[ERROR]: Failed to delete reaction | ${error.message}`);
+    return res
+      .status(404)
+      .json({ success: false, error: "Failed to delete reaction" });
+  }
 };
+
+module.exports = { createReactionForThought, deleteReactionByThought };

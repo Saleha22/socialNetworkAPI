@@ -1,10 +1,13 @@
-const router = require("express").Router();
+const { Router } = require("express");
+
 const {
-  addReaction,
-  deleteReaction,
+  createReactionForThought,
+  deleteReactionByThought,
 } = require("../../controllers/api/reactions");
 
-router.post("/:id", addReaction);
-router.delete("/:id", deleteReaction);
+const router = Router({ mergeParams: true });
+
+router.post("/", createReactionForThought);
+router.delete("/:reactionId", deleteReactionByThought);
 
 module.exports = router;
